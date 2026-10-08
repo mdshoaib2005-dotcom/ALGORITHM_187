@@ -1,0 +1,109 @@
+#include <stdio.h>
+
+#define INF 99999
+
+int main()
+{
+    int n, i, j, k, source;
+    int graph[20][20];
+    int dist[20];
+
+    /* Read number of vertices */
+    printf("Enter number of vertices: ");
+    scanf("%d", &n);
+
+    /* Read weighted adjacency matrix */
+    printf("Enter the weighted adjacency matrix:\n");
+    printf("(Enter 0 if there is no edge)\n");
+
+    for (i = 0; i < n; i++)
+    {
+        for (j = 0; j < n; j++)
+        {
+            scanf("%d", &graph[i][j]);
+        }
+    }
+
+    /* Display adjacency matrix */
+    printf("\nEntered Adjacency Matrix:\n");
+    for (i = 0; i < n; i++)
+    {
+        for (j = 0; j < n; j++)
+        {
+            printf("%6d", graph[i][j]);
+        }
+        printf("\n");
+    }
+
+    /* Read source vertex */
+    printf("\nEnter source vertex (1 to %d): ", n);
+    scanf("%d", &source);
+
+    source--;   /* Convert to 0-based indexing */
+
+    /* Initialize distances */
+    for (i = 0; i < n; i++)
+        dist[i] = INF;
+
+    dist[source] = 0;
+
+    /*
+     * Bellman-Ford:
+     * Relax all edges n-1 times.
+     */
+    for (k = 1; k <= n - 1; k++)
+    {
+        for (i = 0; i < n; i++)
+        {
+            for (j = 0; j < n; j++)
+            {
+                /* 0 means no edge, except diagonal */
+                if (i != j && graph[i][j] != 0)
+                {
+                    if (dist[i] != INF &&
+                        dist[i] + graph[i][j] < dist[j])
+                    {
+                        dist[j] = dist[i] + graph[i][j];
+                    }
+                }
+            }
+        }
+    }
+
+    /*
+     * Check for a negative-weight cycle
+     * reachable from the source.
+     */
+    for (i = 0; i < n; i++)
+    {
+        for (j = 0; j < n; j++)
+        {
+            if (i != j && graph[i][j] != 0)
+            {
+                if (dist[i] != INF &&
+                    dist[i] + graph[i][j] < dist[j])
+                {
+                    printf("\nGraph contains a negative-weight cycle "
+                           "reachable from the source.\n");
+                    return 0;
+                }
+            }
+        }
+    }
+
+    /* Display shortest distances */
+    printf("\nShortest distances from vertex %d:\n", source + 1);
+
+    for (i = 0; i < n; i++)
+    {
+        if (dist[i] == INF)
+            printf("To vertex %d = INF (Unreachable)\n", i + 1);
+        else
+            printf("To vertex %d = %d\n", i + 1, dist[i]);
+    }
+
+    printf("\nNo negative-weight cycle is reachable from the source.\n");
+
+    return 0;
+}
+
